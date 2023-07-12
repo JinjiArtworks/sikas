@@ -1,57 +1,69 @@
 <?php
 
-use App\Http\Controllers\FaqController;
-use App\Http\Controllers\HomeController;
-use App\Http\Controllers\LoginController;
-use App\Http\Controllers\ProductController;
+use App\Http\Controllers\Customers\FaqController;
+use App\Http\Controllers\Customers\HomeController;
+use App\Http\Controllers\Customers\ProductController;
+use App\Http\Controllers\Owner\EmployeeController;
+use App\Http\Controllers\Staff\CustomerController;
+use App\Http\Controllers\Staff\DashboardController;
+use App\Http\Controllers\Staff\FaqListController;
+use App\Http\Controllers\Staff\TransactionController;
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
-*/
 
-// Route::get('/', function () {
-//     return view('welcome');
-// });
+
 Route::get('/shop', [ProductController::class, 'index'])->name('shop');
-Route::get('/', [HomeController::class, 'index'])->name('dashboard');
-Route::get('/faq-cust', [FaqController::class, 'index'])->name('faq');
-
-
-Route::get('/login', [LoginController::class, 'index'])->name('login');
-Route::get('/login', [LoginController::class, 'authenticate'])->name('login');
-Route::get('/logout', [LoginController::class, 'logout'])->name('login');
-
-
-Route::get('/data-transaction', function () {
-    return view('admin.data-transaction');
-});
-Route::get('/data-employee', function () {
-    return view('admin.data-employee');
-});
-Route::get('/faq', function () {
-    return view('admin.faq');
-});
-Route::get('/dashboard', function () {
-    return view('staff.dashboard');
+Route::get('/', [HomeController::class, 'index'])->name('shop');
+Route::view('/laporan', 'owner.laporan');
+Route::group(['as' => 'faq-cust.'], function () {
+    Route::get('/faq-cust', [FaqController::class, 'index']);
+    Route::get('/faq-create', [FaqController::class, 'create'])->name('create');
+    Route::post('/faq-store', [FaqController::class, 'store'])->name('store');
 });
 
-
-
-Route::get('/login', function () {
-    return view('auth.login');
+Route::middleware(['auth'])->group(function () {
+    Route::group(['as' => 'staff.'], function () {
+        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+        Route::get('/create-product', [DashboardController::class, 'create'])->name('create');
+        Route::get('/edit-product/{id}', [DashboardController::class, 'edit'])->name('edit');
+        Route::post('/store-product', [DashboardController::class, 'store'])->name('store');
+        Route::put('/update-product/{id}', [DashboardController::class, 'update'])->name('update');
+        Route::get('/delete-product/{id}', [DashboardController::class, 'destroy'])->name('delete');
+    });
+    Route::group(['as' => 'transaction.'], function () {
+        Route::get('/data-transaction', [TransactionController::class, 'index']);
+        Route::get('/create-transaction', [TransactionController::class, 'create'])->name('create');
+        Route::get('detail-transaction/{id}', [TransactionController::class, 'details'])->name('details');
+        Route::post('/add-to-cart', [TransactionController::class, 'cartProducts'])->name('add');
+        Route::get('/edit-transaction/{id}', [TransactionController::class, 'edit'])->name('edit');
+        Route::post('/store-transaction', [TransactionController::class, 'store'])->name('store');
+        Route::put('/update-transaction/{id}', [TransactionController::class, 'update'])->name('update');
+        Route::get('/delete-transaction/{id}', [TransactionController::class, 'destroy'])->name('delete');
+        Route::get('/delete-cart/{id}', [TransactionController::class, 'deleteCart'])->name('deleteCart');
+    });
+    Route::group(['as' => 'customers.'], function () {
+        Route::get('/data-customer', [CustomerController::class, 'index']);
+        Route::get('/create-customer', [CustomerController::class, 'create'])->name('create');
+        Route::get('/edit-customer/{id}', [CustomerController::class, 'edit'])->name('edit');
+        Route::post('/store-customer', [CustomerController::class, 'store'])->name('store');
+        Route::put('/update-customer/{id}', [CustomerController::class, 'update'])->name('update');
+        Route::get('/delete-customer/{id}', [CustomerController::class, 'destroy'])->name('delete');
+    });
+    Route::group(['as' => 'employees.'], function () {
+        Route::get('/data-employee', [EmployeeController::class, 'index']);
+        Route::get('/create-employee', [EmployeeController::class, 'create'])->name('create');
+        Route::get('/edit-employee/{id}', [EmployeeController::class, 'edit'])->name('edit');
+        Route::post('/store-employee', [EmployeeController::class, 'store'])->name('store');
+        Route::put('/update-employee/{id}', [EmployeeController::class, 'update'])->name('update');
+        Route::get('/delete-employee/{id}', [EmployeeController::class, 'destroy'])->name('delete');
+    });
+    Route::group(['as' => 'faq.'], function () {
+        Route::get('/data-faqs', [FaqListController::class, 'index']);
+        Route::get('/create-faq', [FaqListController::class, 'create'])->name('create');
+        Route::get('/edit-faq/{id}', [FaqListController::class, 'edit'])->name('edit');
+        Route::post('/store-faq', [FaqListController::class, 'store'])->name('store');
+        Route::put('/update-faq/{id}', [FaqListController::class, 'update'])->name('update');
+        Route::get('/delete-faq/{id}', [FaqListController::class, 'destroy'])->name('delete');
+    });
 });
-Route::get('/register', function () {
-    return view('auth.register-cust');
-});
-// Route::post('/logout', 'LoginController@logout');
-// Route::get('/edit-motif/{id}', 'AdminController@editMotif')->name('motif.edit')->middleware('auth');
-// Route::put('/update-motif/{id}', 'AdminController@updateMotif')->name('motif.update')->middleware('auth');
-// Route::get('/motif-delete/{id}', 'AdminController@removeMotif')->name('motif.delete')->middleware('auth');
+require __DIR__ . '/auth.php';

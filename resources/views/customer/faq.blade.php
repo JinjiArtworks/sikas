@@ -1,12 +1,19 @@
 @extends('layouts.customer')
 @section('content')
     <div class="container pb-16 ">
-        <h2 class="text-2xl font-medium text-gray-800  mb-6 mt-10">Frequently Asked Question (FAQ)</h2>
+        <h2 class="text-2xl font-medium text-gray-800  mb-6 mt-10">Frequently Asked Question(FAQ)</h2>
         <div class="bg-white overflow-auto">
             <div class="flex items-start mx-2 my-2">
                 <div class="w-full  my-1">
-                    <ul class="flex flex-col">
-                        @foreach ($faq as $item)
+                    <div class="flex transform hover:text-blue-500 ">
+                        <a href="/faq-create">
+                            <p class="text-md pb-3 flex items-center ml-5 text-blue-700 underline">
+                                + Kirim Pertanyaan
+                            </p>
+                        </a>
+                    </div>
+                    @foreach ($faq as $item)
+                        <ul class="flex flex-col">
                             <li class="bg-white my-2 shadow-lg" x-data="accordion(1)">
                                 <h2 @click="handleClick()"
                                     class="flex flex-row justify-between items-center font-semibold p-3 cursor-pointer">
@@ -26,9 +33,8 @@
                                     </p>
                                 </div>
                             </li>
-                        @endforeach
-
-                    </ul>
+                        </ul>
+                    @endforeach
                 </div>
             </div>
         </div>
